@@ -5,6 +5,7 @@ import views from 'koa-views';
 import { ChatGPTAPI } from 'chatgpt';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+let limit = 0;
 
 const run = () => {
   let parentMessageId;
@@ -27,8 +28,12 @@ const run = () => {
     if (!q) return next();
 
     try {
+      limit++;
+      if (limit > 100) return next();
+
       const res = await gptBot.sendMessage(q, { parentMessageId });
       parentMessageId = res.id;
+
       await ctx.render('index', {
         title: 'zl_gpt',
         message: res.text,
